@@ -341,10 +341,12 @@ unsigned long handshake_timer = 0;
 
 void amis::AMISComponent::loop() {
   unsigned long now = millis();
-  ESP_LOGD(TAG, "Handshake state: %d", handshake_state);
   // 🔁 Handshake-Logik
   switch (handshake_state) {
     case HANDSHAKE_IDLE:
+      if (now - handshake_timer < 30000) {
+        return;
+      }
       this->parent_->set_baud_rate(300);
       delay(100);
       this->write_str("/?!\r\n");
