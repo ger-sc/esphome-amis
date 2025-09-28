@@ -385,15 +385,25 @@ void amis::AMISComponent::loop() {
       return;
 
     case HANDSHAKE_SENT_REQUEST:
-      if (now - handshake_timer > 1800) {
-        const uint8_t ack_mode_c[] = {0x06, 0x30, 0x35, 0x30, 0x0D, 0x0A};
-        this->write_array(ack_mode_c, sizeof(ack_mode_c));
-        ESP_LOGD(TAG, "Sent ACK + Mode C");
-        handshake_timer = now;
-        handshake_state = HANDSHAKE_SENT_ACK;
-        return;
+      if (now - handshake_timer > 100) {
+        char response_buffer[256];
+        int response_index = 0;
+        while (this->available()) {
+          char c = this->read();
+          if (c >= 32 && c <= 126) {  // ASCII printable
+            response_buffer[response_index++] = c;
+            if (response_index >= sizeof(response_buffer)) response_index = 0;
+          }
+        }
+        ESP_LOGD(TAG, "Handshake response: %s", response_buffer);
       }
-      break;
+      
+      const uint8_t ack_mode_c[] = {0x06, 0x30, 0x35, 0x30, 0x0D, 0x0A};
+      this->write_array(ack_mode_c, sizeof(ack_mode_c));
+      ESP_LOGD(TAG, "Sent ACK + Mode C");
+      handshake_timer = now;
+      handshake_state = HANDSHAKE_SENT_ACK;
+      return;
 
     case HANDSHAKE_SENT_ACK:
       if (now - handshake_timer > 200) {
@@ -419,10 +429,9 @@ void amis::AMISComponent::loop() {
   while (cnt > 0) {
     ESP_LOGD(TAG, "bytes available, reading");
     if((this->bytes + cnt) < sizeof(this->buffer)) {
-	  this->read_array(&this->buffer[bytes], cnt);
-	  bytes += cnt;
-  
-	  cnt = this->available();
+	    this->read_array(&this->buffer[bytes], cnt);
+	    bytes += cnt;
+   	  cnt = this->available();
     } else {
       ESP_LOGD(TAG, "rcv'd incomplete frame, clearing buffer");
       while(cnt > 0) {
