@@ -27,24 +27,24 @@ void AMISComponent::perform_handshake() {
   // Schritt 2: Sende "/?!\r\n"
   const uint8_t request_id[] = {0x2F, 0x3F, 0x21, 0x0D, 0x0A};
   this->write_array(request_id, sizeof(request_id));
-  ESP_LOGD("AMIS", "Sent identification request");
+  ESP_LOGD(TAG, "Sent identification request");
 
   // Schritt 3: Warte auf Antwort
   delay(1800);
   while (this->available()) {
     char c = this->read();
-    ESP_LOGD("AMIS", "Received: %c", c);
+    ESP_LOGD(TAG, "Received: %c", c);
   }
 
   // Schritt 4: Sende ACK + Mode C (9600 Baud)
   const uint8_t ack_mode_c[] = {0x06, 0x30, 0x35, 0x30, 0x0D, 0x0A};
   this->write_array(ack_mode_c, sizeof(ack_mode_c));
-  ESP_LOGD("AMIS", "Sent ACK + Mode C");
+  ESP_LOGD(TAG, "Sent ACK + Mode C");
 
   // Schritt 5: Wechsel auf 9600 Baud
   delay(200);
   this->parent_->set_baud_rate(9600);
-  ESP_LOGD("AMIS", "Switched to 9600 baud");
+  ESP_LOGD(TAG, "Switched to 9600 baud");
 
   // Schritt 6: Warte auf Datenstrom
   delay(1000);
