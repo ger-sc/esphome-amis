@@ -361,6 +361,7 @@ void amis::AMISComponent::loop() {
       return;
 
     case HANDSHAKE_SENT_REQUEST:
+      response_index = 0;
       while (this->available()) {
         char c = this->read();
         ESP_LOGD(TAG, "Received byte: 0x%02X (%c)", c, c);
