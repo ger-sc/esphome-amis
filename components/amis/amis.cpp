@@ -16,7 +16,6 @@ static const char *TAG = "amis";
 void amis::AMISComponent::setup() {
   this->bytes = 0;
   this->expect = 0;
-  this->perform_handshake();
 }
 
 void AMISComponent::perform_handshake() {
@@ -361,9 +360,61 @@ void amis::AMISComponent::dump_config() {
 
 }
 
+enum HandshakeState {
+  HANDSHAKE_IDLE,
+  HANDSHAKE_SENT_REQUEST,
+  HANDSHAKE_SENT_ACK,
+  HANDSHAKE_DONE
+};
+
+HandshakeState handshake_state = HANDSHAKE_IDLE;
+unsigned long handshake_timer = 0;
+
 void amis::AMISComponent::loop() {
-  // This is the polling routine
-  // Do we actually need a loop?
+  unsigned long now = millis();
+
+  // 🔁 Handshake-Logik
+  switch (handshake_state) {
+    case HANDSHAKE_IDLE:
+      this->parent_->set_baud_rate(300);
+      delay(100);
+      this->write_str("/?!\r\n");
+      ESP_LOGD(TAG, "Sent /?! request");
+      handshake_timer = now;
+      handshake_state = HANDSHAKE_SENT_REQUEST;
+      return;
+
+    case HANDSHAKE_SENT_REQUEST:
+      if (now - handshake_timer > 1800) {
+        const uint8_t ack_mode_c[] = {0x06, 0x30, 0x35, 0x30, 0x0D, 0x0A};
+        this->write_array(ack_mode_c, sizeof(ack_mode_c));
+        ESP_LOGD(TAG, "Sent ACK + Mode C");
+        handshake_timer = now;
+        handshake_state = HANDSHAKE_SENT_ACK;
+        return;
+      }
+      break;
+
+    case HANDSHAKE_SENT_ACK:
+      if (now - handshake_timer > 200) {
+        this->parent_->set_baud_rate(9600);
+        ESP_LOGD(TAG, "Switched to 9600 baud");
+        handshake_state = HANDSHAKE_DONE;
+        this->bytes = 0;
+        this->expect = 0;
+        return;
+      }
+      break;
+
+    case HANDSHAKE_DONE:
+      break;
+  }
+
+  // 📡 Normale Empfangslogik
+  if (handshake_state != HANDSHAKE_DONE)
+    return;  // warte bis Handshake abgeschlossen
+
+
   uint8_t cnt = this->available();
   while (cnt > 0) {
     ESP_LOGD(TAG, "bytes available, reading");
