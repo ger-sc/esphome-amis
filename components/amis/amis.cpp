@@ -332,6 +332,7 @@ void amis::AMISComponent::dump_config() {
 enum HandshakeState {
   HANDSHAKE_IDLE,
   HANDSHAKE_SENT_REQUEST,
+  HANDSHAKE_SEND_ACK,
   HANDSHAKE_SENT_ACK,
   HANDSHAKE_DONE
 };
