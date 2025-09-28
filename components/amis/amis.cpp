@@ -122,7 +122,13 @@ void amis::AMISComponent::amis_decode() {
     // https://github.com/volkszaehler/vzlogger/blob/master/src/protocols/MeterOMS.cpp
     // line 591
 
-
+    std::string dump;
+    for (size_t j = 0; j < this->decode_buffer.size(); j++) {
+      char buf[6];
+      snprintf(buf, sizeof(buf), "%02X ", this->decode_buffer[j]);
+      dump += buf;
+    }
+    ESP_LOGD(TAG, "Datagram Dump: %s", dump.c_str());
 
     i = 2;
     // 80 is the maximum size of data that we decrypt
@@ -164,6 +170,8 @@ void amis::AMISComponent::amis_decode() {
       
       i++;
       
+      ESP_LOGD(TAG, "DIF=0x%02X DIFE=0x%02X VIF=0x%02X VIFE=0x%02X LEN=%d", dif, dife, vif, vife, data_len);
+
       switch(vif) {
         case 0x6d:
           t.tm_sec = this->decode_buffer[i] & 0x3f;
