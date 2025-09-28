@@ -339,6 +339,9 @@ enum HandshakeState {
 HandshakeState handshake_state = HANDSHAKE_IDLE;
 unsigned long handshake_timer = 0;
 
+char response_buffer[256];
+int response_index = 0;
+
 void amis::AMISComponent::loop() {
   unsigned long now = millis();
   // 🔁 Handshake-Logik
@@ -357,14 +360,10 @@ void amis::AMISComponent::loop() {
       return;
 
     case HANDSHAKE_SENT_REQUEST:
-      char response_buffer[256];
-      int response_index = 0;
       while (this->available()) {
         char c = this->read();
-        if (c >= 32 && c <= 126) {  // ASCII printable
-          response_buffer[response_index++] = c;
-          if (response_index >= sizeof(response_buffer)) response_index = 0;
-        }
+        response_buffer[response_index++] = c;
+        if (response_index >= sizeof(response_buffer)) response_index = 0;
       }
       ESP_LOGD(TAG, "Handshake response: %s", response_buffer);
       delay(300);

@@ -15,7 +15,6 @@ class AMISComponent : public Component, public uart::UARTDevice {
   void setup() override;
   void dump_config() override;
   void loop() override;
-  void perform_handshake();
   void amis_decode();
   void set_power_grid_key(const std::string &power_grid_key);
   void set_energy_a_positive_sensor(sensor::Sensor *sensor) {
