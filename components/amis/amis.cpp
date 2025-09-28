@@ -400,7 +400,7 @@ void amis::AMISComponent::loop() {
         return;
       }
       
-      this->write_array((const uint8_t[]){0x06, 0x30, 0x35, 0x30, 0x0D, 0x0A}, 6)
+      this->write_array((const uint8_t[]){0x06, 0x30, 0x35, 0x30, 0x0D, 0x0A}, 6);
       ESP_LOGD(TAG, "Sent ACK + Mode C");
       handshake_timer = now;
       handshake_state = HANDSHAKE_SENT_ACK;
