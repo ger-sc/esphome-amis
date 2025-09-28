@@ -396,6 +396,8 @@ void amis::AMISComponent::loop() {
           }
         }
         ESP_LOGD(TAG, "Handshake response: %s", response_buffer);
+      } else {
+        return;
       }
       
       const uint8_t ack_mode_c[] = {0x06, 0x30, 0x35, 0x30, 0x0D, 0x0A};
