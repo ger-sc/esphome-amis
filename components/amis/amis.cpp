@@ -16,7 +16,38 @@ static const char *TAG = "amis";
 void amis::AMISComponent::setup() {
   this->bytes = 0;
   this->expect = 0;
+  this->perform_handshake();
+}
 
+void AMISComponent::perform_handshake() {
+  // Schritt 1: Setze Baudrate auf 300
+  this->set_baud_rate(300);
+  delay(100);
+
+  // Schritt 2: Sende "/?!\r\n"
+  const uint8_t request_id[] = {0x2F, 0x3F, 0x21, 0x0D, 0x0A};
+  this->write_array(request_id, sizeof(request_id));
+  ESP_LOGD("AMIS", "Sent identification request");
+
+  // Schritt 3: Warte auf Antwort
+  delay(1800);
+  while (this->available()) {
+    char c = this->read();
+    ESP_LOGD("AMIS", "Received: %c", c);
+  }
+
+  // Schritt 4: Sende ACK + Mode C (9600 Baud)
+  const uint8_t ack_mode_c[] = {0x06, 0x30, 0x35, 0x30, 0x0D, 0x0A};
+  this->write_array(ack_mode_c, sizeof(ack_mode_c));
+  ESP_LOGD("AMIS", "Sent ACK + Mode C");
+
+  // Schritt 5: Wechsel auf 9600 Baud
+  delay(200);
+  this->set_baud_rate(9600);
+  ESP_LOGD("AMIS", "Switched to 9600 baud");
+
+  // Schritt 6: Warte auf Datenstrom
+  delay(1000);
 }
 
 void amis::AMISComponent::hex2bin(const std::string s, uint8_t *buf) {
