@@ -68,8 +68,8 @@ class AMISComponent : public Component, public uart::UARTDevice {
 
  protected:
   int bytes;
-  uint8_t buffer[256];
-  uint8_t decode_buffer[128];
+  uint8_t buffer[512];
+  uint8_t decode_buffer[256];
   int expect;
   uint8_t iv[16];
   uint8_t key[16];
