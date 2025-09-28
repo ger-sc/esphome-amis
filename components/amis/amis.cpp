@@ -341,7 +341,7 @@ unsigned long handshake_timer = 0;
 
 void amis::AMISComponent::loop() {
   unsigned long now = millis();
-  ESP_LOGD(TAG, "Handshake state: %d", session_state);
+  ESP_LOGD(TAG, "Handshake state: %d", handshake_state);
   // 🔁 Handshake-Logik
   switch (handshake_state) {
     case HANDSHAKE_IDLE:
