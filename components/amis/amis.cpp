@@ -373,7 +373,7 @@ void amis::AMISComponent::loop() {
         handshake_timer = now;
         handshake_state = HANDSHAKE_IDLE;
         delay(30000);
-      } else {
+      } else if (response_index > 0) {
         ESP_LOGD(TAG, "Handshake response: %s", response_buffer);
         handshake_timer = now;
         handshake_state = HANDSHAKE_SEND_ACK;
