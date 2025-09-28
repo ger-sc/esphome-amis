@@ -363,10 +363,16 @@ void amis::AMISComponent::loop() {
     case HANDSHAKE_SENT_REQUEST:
       while (this->available()) {
         char c = this->read();
+        ESP_LOGD(TAG, "Received byte: 0x%02X (%c)", c, c);
         response_buffer[response_index++] = c;
         if (response_index >= sizeof(response_buffer)) response_index = 0;
       }
-      if (response_index > 0) {
+      if (response_index > 0 && response_index < 5) {
+        ESP_LOGD(TAG, "Handshake not successful: %s", response_buffer);
+        handshake_timer = now;
+        handshake_state = HANDSHAKE_IDLE;
+        delay(30000);
+      } else {
         ESP_LOGD(TAG, "Handshake response: %s", response_buffer);
         handshake_timer = now;
         handshake_state = HANDSHAKE_SEND_ACK;
