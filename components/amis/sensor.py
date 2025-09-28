@@ -15,7 +15,7 @@ from esphome.const import (
     UNIT_VOLT_AMPS_REACTIVE_HOURS,
     UNIT_VOLT_AMPS_REACTIVE,
     UNIT_VOLT,
-    UNIT_AMPS
+    UNIT_AMPERE 
 )
 
 DEPENDENCIES = ["uart"]
@@ -112,19 +112,19 @@ CONFIG_SCHEMA = (
                 state_class=STATE_CLASS_MEASUREMENT
             ),
             cv.Optional(CONF_CURRENT_L1): sensor.sensor_schema(
-                unit_of_measurement=UNIT_VOLT,
+                unit_of_measurement=UNIT_AMPERE,
                 accuracy_decimals=0,
                 device_class=DEVICE_CLASS_CURRENT,
                 state_class=STATE_CLASS_MEASUREMENT
             ),
             cv.Optional(CONF_CURRENT_L2): sensor.sensor_schema(
-                unit_of_measurement=UNIT_VOLT,
+                unit_of_measurement=UNIT_AMPERE,
                 accuracy_decimals=0,
                 device_class=DEVICE_CLASS_CURRENT,
                 state_class=STATE_CLASS_MEASUREMENT
             ),
             cv.Optional(CONF_CURRENT_L3): sensor.sensor_schema(
-                unit_of_measurement=UNIT_VOLT,
+                unit_of_measurement=UNIT_AMPERE,
                 accuracy_decimals=0,
                 device_class=DEVICE_CLASS_CURRENT,
                 state_class=STATE_CLASS_MEASUREMENT
