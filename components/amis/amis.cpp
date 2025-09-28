@@ -369,7 +369,7 @@ void amis::AMISComponent::loop() {
         response_buffer[response_index++] = c;
         if (response_index >= sizeof(response_buffer)) response_index = 0;
       }
-      if (response_index > 0 && response_index < 5) {
+      if (response_index > 0 && response_index < 10) {
         ESP_LOGD(TAG, "Handshake not successful: %s on attempt %d", response_buffer, response_attempts++);
         if (response_attempts >= 3) {
           response_attempts = 0;
