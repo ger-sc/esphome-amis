@@ -365,8 +365,14 @@ void amis::AMISComponent::loop() {
         response_buffer[response_index++] = c;
         if (response_index >= sizeof(response_buffer)) response_index = 0;
       }
-      ESP_LOGD(TAG, "Handshake response: %s", response_buffer);
-      delay(300);
+      if (response_index > 0) {
+        ESP_LOGD(TAG, "Handshake response: %s", response_buffer);
+        handshake_timer = now;
+        handshake_state = HANDSHAKE_SEND_ACK;
+      }
+      return;
+
+    case HANDSHAKE_SEND_ACK:
       this->write_array((const uint8_t[]){0x06, 0x30, 0x35, 0x30, 0x0D, 0x0A}, 6);
       ESP_LOGD(TAG, "Sent ACK + Mode C");
       handshake_timer = now;
@@ -374,17 +380,14 @@ void amis::AMISComponent::loop() {
       return;
 
     case HANDSHAKE_SENT_ACK:
-      if (now - handshake_timer > 200) {
-        this->parent_->set_baud_rate(9600);
-        delay(300);
-        ESP_LOGD(TAG, "Switched to 9600 baud");
-        handshake_state = HANDSHAKE_DONE;
-        this->bytes = 0;
-        this->expect = 0;
-        return;
-      }
-      break;
-
+      this->parent_->set_baud_rate(9600);
+      delay(300);
+      ESP_LOGD(TAG, "Switched to %d baud", this->parent_->get_baud_rate());
+      handshake_state = HANDSHAKE_DONE;
+      this->bytes = 0;
+      this->expect = 0;
+      return;
+      
     case HANDSHAKE_DONE:
       break;
   }
