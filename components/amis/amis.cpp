@@ -123,7 +123,7 @@ void amis::AMISComponent::amis_decode() {
     // line 591
 
     std::string dump;
-    for (size_t j = 0; j < this->decode_buffer.size(); j++) {
+    for (size_t j = 0; j < sizeof(this->decode_buffer); j++) {
       char buf[6];
       snprintf(buf, sizeof(buf), "%02X ", this->decode_buffer[j]);
       dump += buf;
