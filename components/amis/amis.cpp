@@ -21,7 +21,7 @@ void amis::AMISComponent::setup() {
 
 void AMISComponent::perform_handshake() {
   // Schritt 1: Setze Baudrate auf 300
-  this->set_baud_rate(300);
+  this->parent_->set_baud_rate(300);
   delay(100);
 
   // Schritt 2: Sende "/?!\r\n"
@@ -43,7 +43,7 @@ void AMISComponent::perform_handshake() {
 
   // Schritt 5: Wechsel auf 9600 Baud
   delay(200);
-  this->set_baud_rate(9600);
+  this->parent_->set_baud_rate(9600);
   ESP_LOGD("AMIS", "Switched to 9600 baud");
 
   // Schritt 6: Warte auf Datenstrom
